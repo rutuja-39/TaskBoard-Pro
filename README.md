@@ -1,6 +1,3 @@
-// ==========================
-// README.md (enhanced)
-// ==========================
 # 🚀 TaskBoard Pro
 
 **TaskBoard Pro** is a full-stack, containerized, Kanban-style project management tool designed for Agile teams. Built with Angular, Node.js, MongoDB, and JWT authentication, it allows seamless collaboration, real-time task tracking, and a delightful user experience.
@@ -125,6 +122,4 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 - Inspired by Agile boards like Trello & Jira
 - Powered by open-source tools
 
----
 
-Built with 💻 by [Your Name]
