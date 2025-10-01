@@ -1,17 +1,56 @@
-version: '3'
+version: '3.8'
+
 services:
+  # MongoDB Service
   mongo:
-    image: mongo
+    image: mongo:latest
+    container_name: taskboard-mongo
+    restart: unless-stopped
     ports:
       - "27017:27017"
-
-  backend:
-    build:
-      context: ./docker
-      dockerfile: Dockerfile.backend
+    environment:
+      - MONGO_INITDB_DATABASE=taskboard
     volumes:
-      - ../server:/app
+      - mongo-data:/data/db
+      - mongo-config:/data/configdb
+    networks:
+      - taskboard-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/taskboard --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # TaskBoard Pro Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: taskboard-app
+    restart: unless-stopped
     ports:
       - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://mongo:27017/taskboard
+      - JWT_SECRET=${JWT_SECRET:-please-change-this-secret-key-min-32-chars}
+      - PORT=3000
     depends_on:
-      - mongo
+      mongo:
+        condition: service_healthy
+    networks:
+      - taskboard-network
+    volumes:
+      # Mount .env.local for environment variables (optional)
+      - ./.env.local:/app/.env.local:ro
+
+networks:
+  taskboard-network:
+    driver: bridge
+
+volumes:
+  mongo-data:
+    driver: local
+  mongo-config:
+    driver: local
+

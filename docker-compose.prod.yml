@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  # MongoDB with authentication
+  mongo:
+    image: mongo:latest
+    container_name: taskboard-mongo-prod
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME:-admin}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD:-changeme}
+      - MONGO_INITDB_DATABASE=taskboard
+    volumes:
+      - mongo-data-prod:/data/db
+      - mongo-config-prod:/data/configdb
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - taskboard-network-prod
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/taskboard -u admin -p changeme --authenticationDatabase admin --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # TaskBoard Pro Application (Production)
+  app:
+    image: taskboard-pro:latest
+    container_name: taskboard-app-prod
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://${MONGO_ROOT_USERNAME:-admin}:${MONGO_ROOT_PASSWORD:-changeme}@mongo:27017/taskboard?authSource=admin
+      - JWT_SECRET=${JWT_SECRET}
+      - PORT=3000
+      - HOSTNAME=0.0.0.0
+    depends_on:
+      mongo:
+        condition: service_healthy
+    networks:
+      - taskboard-network-prod
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/auth/me"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Optional: Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: taskboard-nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - app
+    networks:
+      - taskboard-network-prod
+
+networks:
+  taskboard-network-prod:
+    driver: bridge
+
+volumes:
+  mongo-data-prod:
+    driver: local
+  mongo-config-prod:
+    driver: local
+
