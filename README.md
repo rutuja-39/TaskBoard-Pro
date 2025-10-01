@@ -505,11 +505,6 @@ Contributions are welcome! Please:
 - [ ] Voice/video chat integration
 - [ ] Advanced analytics dashboard
 
-## 📞 Support
-
-For issues or questions:
-- Open an issue on GitHub
-- Contact: your-email@example.com
 
 ---
 
