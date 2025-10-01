@@ -1,6 +1,6 @@
 # 🚀 TaskBoard Pro
 
-**TaskBoard Pro** is a full-stack, containerized, Kanban-style project management tool designed for Agile teams. Built with Angular, Node.js, MongoDB, and JWT authentication, it allows seamless collaboration, real-time task tracking, and a delightful user experience.
+**TaskBoard Pro** is a full-stack, containerized, Kanban-style project management tool designed for Agile teams. Built with NextJS, Node.js, MongoDB, and JWT authentication, it allows seamless collaboration, real-time task tracking, and a delightful user experience.
 
 ---
 
@@ -19,7 +19,7 @@
 
 | Layer         | Technology                      |
 |---------------|----------------------------------|
-| Frontend      | Angular, HTML, CSS              |
+| Frontend      | NextJS, HTML, CSS              |
 | Backend       | Node.js, Express                |
 | Database      | MongoDB                         |
 | Authentication| JWT                             |
@@ -31,7 +31,7 @@
 ## 📁 Project Structure
 ```
 taskboard-pro/
-├── client/           # Angular Frontend
+├── client/           # NextJS Frontend
 ├── server/           # Node.js + Express Backend
 ├── docker/           # Dockerfiles & Compose
 ├── kubernetes/       # Kubernetes manifests
